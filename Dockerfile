@@ -1,17 +1,17 @@
-FROM alpine:latest
+FROM node:lts-alpine
 
-# تثبيت الأدوات الضرورية
-RUN apk add --no-cache ca-certificates curl unzip envsubst
+# تثبيت المتطلبات
+RUN apk add --no-cache curl unzip
 
-# تحميل V2Ray
+# تحميل نواة السيرفر
 RUN mkdir /v2ray_bin && \
     curl -L https://github.com/v2fly/v2ray-core/releases/latest/download/v2ray-linux-64.zip -o /v2ray.zip && \
     unzip /v2ray.zip -d /v2ray_bin && \
     chmod +x /v2ray_bin/v2ray && \
     rm /v2ray.zip
 
-# إنشاء ملف إعدادات مرن (Template)
-RUN echo '{"log":{"loglevel":"none"},"inbounds":[{"port":${PORT},"protocol":"vless","settings":{"clients":[{"id":"00000000-0000-0000-0000-000000000000"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/v2ray-path"}}}],"outbounds":[{"protocol":"freedom"}]}' > /config.json.template
+# إعداد ملف التكوين (سنستخدم بورت 10000 كقيمة افتراضية ونربطه بريندر)
+RUN echo '{"log":{"loglevel":"debug"},"inbounds":[{"port":10000,"protocol":"vless","settings":{"clients":[{"id":"00000000-0000-0000-0000-000000000000"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/v2ray-path"}}}],"outbounds":[{"protocol":"freedom"}]}' > /config.json
 
-# تشغيل السيرفر مع استبدال بورت ريندر في وقت التشغيل
-CMD envsubst '\${PORT}' < /config.json.template > /config.json && /v2ray_bin/v2ray run -c /config.json
+# تشغيل السيرفر باستخدام منفذ ريندر المتغير
+CMD /v2ray_bin/v2ray run -c /config.json -port $PORT
