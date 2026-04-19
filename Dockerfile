@@ -9,9 +9,8 @@ RUN mkdir /v2ray_bin && \
     chmod +x /v2ray_bin/v2ray && \
     rm /v2ray.zip
 
-# إعداد الإعدادات (رندر يستخدم بورت متغير، لذا سنستخدم PORT كمغير بيئة)
-# المعرف UUID: 00000000-0000-0000-0000-000000000000
+# إعداد الإعدادات (لاحظ أننا جعلنا البورت 10000 كافتراضي)
 RUN echo '{"log":{"loglevel":"none"},"inbounds":[{"port":10000,"protocol":"vless","settings":{"clients":[{"id":"00000000-0000-0000-0000-000000000000"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/v2ray-path"}}}],"outbounds":[{"protocol":"freedom"}]}' > /config.json
 
-# تشغيل السيرفر على البورت الذي يحدده رندر تلقائياً
+# تشغيل السيرفر وربطه ببورت رندر المتغير $PORT
 CMD /v2ray_bin/v2ray run -c /config.json
