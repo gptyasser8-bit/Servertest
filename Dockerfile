@@ -9,8 +9,8 @@ RUN mkdir /v2ray_bin && \
     chmod +x /v2ray_bin/v2ray && \
     rm /v2ray.zip
 
-# إنشاء ملف الإعدادات ووضع علامة PORT_NUMBER لنقوم بتبديلها لاحقاً
-RUN echo '{"log":{"loglevel":"none"},"inbounds":[{"port":PORT_NUMBER,"protocol":"vless","settings":{"clients":[{"id":"00000000-0000-0000-0000-000000000000"}],"decryption":"none"},"streamSettings":{"network":"ws","wsSettings":{"path":"/v2ray-path"}}}],"outbounds":[{"protocol":"freedom"}]}' > /config.json
+# إعداد VMess بدلاً من VLESS
+RUN echo '{"log":{"loglevel":"none"},"inbounds":[{"port":PORT_NUMBER,"protocol":"vmess","settings":{"clients":[{"id":"00000000-0000-0000-0000-000000000000"}]},"streamSettings":{"network":"ws","wsSettings":{"path":"/v2ray-path"}}}],"outbounds":[{"protocol":"freedom"}]}' > /config.json
 
-# أمر التشغيل: استبدال الكلمة بقيمة البورت الحقيقية ثم تشغيل السيرفر
+# التشغيل مع تبديل البورت
 CMD sed -i "s/PORT_NUMBER/$PORT/g" /config.json && /v2ray_bin/v2ray run -c /config.json
